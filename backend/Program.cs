@@ -22,6 +22,7 @@ builder.Services.AddHttpClient();
 builder.Services.AddSingleton<IHttpService, HttpService>();
 
 builder.Services.AddScoped<IPeriodicTask, FetchApodTask>();
+builder.Services.AddScoped<IPeriodicTask, FetchNeoTask>();
 builder.Services.AddHostedService<PeriodicTaskHostedService>();
 
 builder.Services.AddEndpointsApiExplorer();

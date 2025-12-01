@@ -48,10 +48,6 @@ public class PeriodicTaskHostedService : IHostedService
             {
                 break;
             }
-            catch (Exception ex)
-            {
-                
-            }
 
             try
             {

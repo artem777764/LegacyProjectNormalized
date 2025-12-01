@@ -25,13 +25,12 @@ public class FetchApodTask : IPeriodicTask
     public async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         var url = _opts.ApodUrl;
-        if (!string.IsNullOrEmpty(_opts.NasaApiKey))
-            url += "?api_key=" + "DEMO_KEY";
-        if (!string.IsNullOrEmpty(_opts.NasaApiKey))
-            //url += "?api_key=" + Uri.EscapeDataString(_opts.NasaApiKey);
+        url += "?api_key=" + "DEMO_KEY";
+        //url += "?api_key=" + Uri.EscapeDataString(_opts.NasaApiKey);
 
         try
         {
+            Console.WriteLine($"{Name}: fetching {url}");
             using var doc = await _httpClient.GetJsonDocumentAsync(url, stoppingToken);
             await _repo.InsertSpaceCacheAsync("apod", doc);
         }
