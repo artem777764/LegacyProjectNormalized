@@ -23,6 +23,7 @@ builder.Services.AddSingleton<IHttpService, HttpService>();
 
 builder.Services.AddScoped<IPeriodicTask, FetchApodTask>();
 builder.Services.AddScoped<IPeriodicTask, FetchNeoTask>();
+builder.Services.AddScoped<IPeriodicTask, FetchSpacexTask>();
 builder.Services.AddHostedService<PeriodicTaskHostedService>();
 
 builder.Services.AddEndpointsApiExplorer();
@@ -57,7 +58,7 @@ if (app.Environment.IsDevelopment())
     });
 }
 
- app.UseHttpsRedirection();
+app.UseHttpsRedirection();
 app.UseRouting();
 app.MapControllers();
 
