@@ -4,7 +4,8 @@ public class SpaceOptions
 {
     public string ApodUrl { get; set; } = null!;
     public string NeoUrl { get; set; } = null!;
-    public string DonkiUrl { get; set; } = null!;
+    public string DonkiUrl1 { get; set; } = null!;
+    public string DonkiUrl2 { get; set; } = null!;
     public string SpaceXUrl { get; set; } = null!;
     public string OsdrDatasetUrl { get; set; } = null!;
     public string IssUrl { get; set; } = null!;
