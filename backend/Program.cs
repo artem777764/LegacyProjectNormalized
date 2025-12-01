@@ -25,6 +25,7 @@ builder.Services.AddScoped<IPeriodicTask, FetchApodTask>();
 builder.Services.AddScoped<IPeriodicTask, FetchNeoTask>();
 builder.Services.AddScoped<IPeriodicTask, FetchSpacexTask>();
 builder.Services.AddScoped<IPeriodicTask, FetchDonkiTask>();
+builder.Services.AddScoped<IPeriodicTask, FetchOsdrTask>();
 builder.Services.AddHostedService<PeriodicTaskHostedService>();
 
 builder.Services.AddEndpointsApiExplorer();
