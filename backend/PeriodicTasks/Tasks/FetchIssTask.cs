@@ -10,10 +10,10 @@ public class FetchIssTask : IPeriodicTask
     public string Url { get; }
 
     private readonly IHttpService _httpClient;
-    private readonly ISpaceRepository _repo;
+    private readonly IIssRepository _repo;
     private readonly SpaceOptions _opts;
 
-    public FetchIssTask(IHttpService httpClient, ISpaceRepository repo, IOptions<SpaceOptions> opts)
+    public FetchIssTask(IHttpService httpClient, IIssRepository repo, IOptions<SpaceOptions> opts)
     {
         _httpClient = httpClient;
         _repo = repo;
@@ -30,7 +30,7 @@ public class FetchIssTask : IPeriodicTask
             Console.WriteLine($"{Name}: fetching {Url}");
             using var doc = await _httpClient.GetJsonDocumentAsync(Url, stoppingToken);
             var raw = doc.RootElement.GetRawText();
-            await _repo.InsertSpaceCacheAsync("iss", doc);
+            await _repo.InsertIssDataAsync(Url, doc);
         }
         catch (HttpRequestException hre)
         {

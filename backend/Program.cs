@@ -17,6 +17,7 @@ builder.Services.Configure<SpaceOptions>(
     builder.Configuration.GetSection("SpaceOptions"));
 
 builder.Services.AddScoped<ISpaceRepository, SpaceRepository>();
+builder.Services.AddScoped<IIssRepository, IssRepository>();
     
 builder.Services.AddHttpClient();
 builder.Services.AddSingleton<IHttpService, HttpService>();

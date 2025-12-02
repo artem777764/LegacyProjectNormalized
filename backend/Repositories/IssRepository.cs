@@ -4,26 +4,24 @@ using backend.Models.Entities;
 
 namespace backend.Repositories;
 
-public class SpaceRepository : ISpaceRepository
+public class IssRepository : IIssRepository
 {
     private readonly ApplicationDbContext _context;
 
-    public SpaceRepository(ApplicationDbContext context)
+    public IssRepository(ApplicationDbContext context)
     {
         _context = context;
     }
 
-    public async Task InsertSpaceCacheAsync(string source, JsonDocument payload)
+    public async Task InsertIssDataAsync(string sourceUrl, JsonDocument payload)
     {
-        SpaceCacheEntity item = new SpaceCacheEntity
+        IssFetchLogEntity item = new IssFetchLogEntity
         {
-            Source = source,
+            SourceUrl = sourceUrl,
             Payload = payload.RootElement.GetRawText()
         };
-        
-        _context.SpaceCaches.Add(item);
+
+        _context.IssFetchLogs.Add(item);
         await _context.SaveChangesAsync();
     }
-
-
 }
