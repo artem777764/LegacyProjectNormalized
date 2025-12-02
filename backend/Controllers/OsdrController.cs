@@ -33,9 +33,22 @@ public class OsdrController : ControllerBase
         var stream = await res.Content.ReadAsStreamAsync();
         using var doc = await JsonDocument.ParseAsync(stream);
         int written = await _osdrRepository.SaveOsdrItemsAsync(doc);
-        return Ok(new GetCountOsdr
+        return Ok(new GetCountOsdrDTO
         {
             Written = written,
         });
+    }
+
+    [HttpGet("list")]
+    public async Task<IActionResult> GetLastRecords()
+    {
+        List<OsdrItemEntity> osdrItemEntity = await _osdrRepository.GetLastNRecords(20);
+        return Ok(osdrItemEntity.Select(o => new GetOsdrDTO
+        {
+            Id = o.Id,
+            FetchedAt = o.InsertedAt,
+            Source = "osdr",
+            Payload = o.Raw,
+        }));
     }
 }

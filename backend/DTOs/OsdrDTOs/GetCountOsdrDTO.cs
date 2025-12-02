@@ -1,6 +1,6 @@
 namespace backend.DTOs.OsdrDTOs;
 
-public class GetCountOsdr
+public class GetCountOsdrDTO
 {
     public int Written { get; set; }
 }

@@ -15,6 +15,14 @@ public class OsdrRepository : IOsdrRepository
         _context = context;
     }
 
+    public async Task<List<OsdrItemEntity>> GetLastNRecords(int n)
+    {
+        return await _context.OsdrItems
+            .OrderByDescending(r => r.Id)
+            .Take(n)
+            .ToListAsync();
+    } 
+
     public async Task<int> SaveOsdrItemsAsync(JsonDocument doc)
     {
         var items = ExtractItemsWithOptionalKeys(doc);
