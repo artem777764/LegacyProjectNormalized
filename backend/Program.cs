@@ -23,6 +23,7 @@ builder.Services.AddScoped<IOsdrRepository, OsdrRepository>();
 builder.Services.AddHttpClient();
 builder.Services.AddSingleton<IHttpService, HttpService>();
 
+builder.Services.AddScoped<FetchIssTask>();
 builder.Services.AddScoped<IPeriodicTask, FetchApodTask>();
 builder.Services.AddScoped<IPeriodicTask, FetchNeoTask>();
 builder.Services.AddScoped<IPeriodicTask, FetchSpacexTask>();
