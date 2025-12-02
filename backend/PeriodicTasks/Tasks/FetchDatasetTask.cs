@@ -1,3 +1,4 @@
+using System.Text.Json;
 using backend.PeriodicTasks;
 using backend.Repositories;
 using Microsoft.Extensions.Options;
@@ -9,17 +10,17 @@ public class FetchOsdrTask : IPeriodicTask
     public TimeSpan Interval { get; }
     public string Url { get; }
 
-    private readonly IHttpService _httpClient;
     private readonly ISpaceRepository _repoSpace;
     private readonly IOsdrRepository _repoOsdr;
     private readonly SpaceOptions _opts;
+    private readonly ApiSender _apiSender;
 
-    public FetchOsdrTask(IHttpService httpClient, ISpaceRepository repoSpace, IOsdrRepository repoOsdr, IOptions<SpaceOptions> opts)
+    public FetchOsdrTask(ISpaceRepository repoSpace, IOsdrRepository repoOsdr, IOptions<SpaceOptions> opts, ApiSender apiSender)
     {
-        _httpClient = httpClient;
         _repoSpace = repoSpace;
         _repoOsdr = repoOsdr;
         _opts = opts.Value;
+        _apiSender = apiSender;
 
         Interval = TimeSpan.FromSeconds(Math.Max(1, _opts.OsdrInterval));
         Url = _opts.OsdrDatasetUrl;
@@ -27,25 +28,8 @@ public class FetchOsdrTask : IPeriodicTask
 
     public async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        try
-        {
-            Console.WriteLine($"{Name}: fetching {Url}");
-            using var doc = await _httpClient.GetJsonDocumentAsync(Url, stoppingToken);
-            var raw = doc.RootElement.GetRawText();
-            await _repoSpace.InsertSpaceCacheAsync("osdr", doc);
-            await _repoOsdr.SaveOsdrItemsAsync(doc);
-        }
-        catch (HttpRequestException hre)
-        {
-            Console.WriteLine($"{Name}: HTTP error: {hre.Message}");
-        }
-        catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
-        {
-            Console.WriteLine($"{Name}: cancelled");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"{Name}: unexpected error: {ex}");
-        }
+        JsonDocument? doc = await _apiSender.Send(Url, stoppingToken);
+        if (doc != null) await _repoSpace.InsertSpaceCacheAsync("osdr", doc);
+        if (doc != null) await _repoOsdr.SaveOsdrItemsAsync(doc);
     }
 }

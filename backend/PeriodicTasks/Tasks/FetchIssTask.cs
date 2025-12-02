@@ -1,3 +1,4 @@
+using System.Text.Json;
 using backend.PeriodicTasks;
 using backend.Repositories;
 using Microsoft.Extensions.Options;
@@ -9,15 +10,17 @@ public class FetchIssTask : IPeriodicTask
     public TimeSpan Interval { get; }
     public string Url { get; }
 
-    private readonly IHttpService _httpClient;
-    private readonly IIssRepository _repo;
+    private readonly IIssRepository _issRepository;
+    private readonly ISpaceRepository _spaceRepository;
     private readonly SpaceOptions _opts;
+    private readonly ApiSender _apiSender;
 
-    public FetchIssTask(IHttpService httpClient, IIssRepository repo, IOptions<SpaceOptions> opts)
+    public FetchIssTask(IIssRepository issRepository, ISpaceRepository spaceRepository, IOptions<SpaceOptions> opts, ApiSender apiSender)
     {
-        _httpClient = httpClient;
-        _repo = repo;
+        _issRepository = issRepository;
+        _spaceRepository = spaceRepository;
         _opts = opts.Value;
+        _apiSender = apiSender;
 
         Interval = TimeSpan.FromSeconds(Math.Max(1, _opts.IssInterval));
         Url = _opts.IssUrl;
@@ -25,24 +28,8 @@ public class FetchIssTask : IPeriodicTask
 
     public async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        try
-        {
-            Console.WriteLine($"{Name}: fetching {Url}");
-            using var doc = await _httpClient.GetJsonDocumentAsync(Url, stoppingToken);
-            var raw = doc.RootElement.GetRawText();
-            await _repo.InsertIssDataAsync(Url, doc);
-        }
-        catch (HttpRequestException hre)
-        {
-            Console.WriteLine($"{Name}: HTTP error: {hre.Message}");
-        }
-        catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
-        {
-            Console.WriteLine($"{Name}: cancelled");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"{Name}: unexpected error: {ex}");
-        }
+        JsonDocument? doc = await _apiSender.Send(Url, stoppingToken);
+        if (doc != null) await _issRepository.InsertIssDataAsync(Url, doc);
+        if (doc != null) await _spaceRepository.InsertSpaceCacheAsync("iss", doc);
     }
 }

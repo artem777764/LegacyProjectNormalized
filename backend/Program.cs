@@ -22,12 +22,14 @@ builder.Services.AddScoped<IOsdrRepository, OsdrRepository>();
     
 builder.Services.AddHttpClient();
 builder.Services.AddSingleton<IHttpService, HttpService>();
+builder.Services.AddSingleton<ApiSender>();
 
 builder.Services.AddScoped<FetchIssTask>();
 builder.Services.AddScoped<IPeriodicTask, FetchApodTask>();
 builder.Services.AddScoped<IPeriodicTask, FetchNeoTask>();
 builder.Services.AddScoped<IPeriodicTask, FetchSpacexTask>();
-builder.Services.AddScoped<IPeriodicTask, FetchDonkiTask>();
+builder.Services.AddScoped<IPeriodicTask, FetchFlrTask>();
+builder.Services.AddScoped<IPeriodicTask, FetchCmeTask>();
 builder.Services.AddScoped<IPeriodicTask, FetchOsdrTask>();
 builder.Services.AddScoped<IPeriodicTask, FetchIssTask>();
 builder.Services.AddHostedService<PeriodicTaskHostedService>();
