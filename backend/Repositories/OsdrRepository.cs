@@ -29,7 +29,7 @@ public class OsdrRepository : IOsdrRepository
                 ? datasetIdFromKey
                 : TryExtractStringValue(el, new[] { "dataset_id", "id", "uuid", "studyId", "accession" });
 
-            var title = TryExtractStringValue(el, new[] { "title", "name", "label" });
+            var title = TryExtractStringValue(el, new[] { "title", "name", "label" }) ?? datasetId;
             var status = TryExtractStringValue(el, new[] { "status", "state", "lifecycle" });
             var updated = TryExtractDateTimeOffset(el, new[] { "updated", "updated_at", "modified", "timestamp" });
 
@@ -45,7 +45,7 @@ public class OsdrRepository : IOsdrRepository
             {
                 existing.Title = title;
                 existing.Status = status;
-                existing.UpdatedAt = updated;
+                existing.UpdatedAt = updated ?? DateTime.UtcNow;
                 existing.Raw = raw;
             }
             else
@@ -55,7 +55,7 @@ public class OsdrRepository : IOsdrRepository
                     DatasetId = datasetId,
                     Title = title,
                     Status = status,
-                    UpdatedAt = updated,
+                    UpdatedAt = updated ?? DateTime.UtcNow,
                     Raw = raw
                 };
 
