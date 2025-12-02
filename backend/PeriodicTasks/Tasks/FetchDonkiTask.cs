@@ -39,7 +39,7 @@ public class FetchDonkiTask : IPeriodicTask
 
             using var doc1 = await _httpClient.GetJsonDocumentAsync(url, stoppingToken);
             var raw1 = doc1.RootElement.GetRawText();
-            await _repo.InsertSpaceCacheAsync("donki", doc1);
+            await _repo.InsertSpaceCacheAsync("flr", doc1);
 
             url = $"{Url2}?startDate={startDate}&endDate={endDate}";
             url += $"&api_key={_opts.NasaApiKey}";
@@ -48,7 +48,7 @@ public class FetchDonkiTask : IPeriodicTask
 
             using var doc2 = await _httpClient.GetJsonDocumentAsync(url, stoppingToken);
             var raw2 = doc2.RootElement.GetRawText();
-            await _repo.InsertSpaceCacheAsync("donki", doc2);
+            await _repo.InsertSpaceCacheAsync("cme", doc2);
         }
         catch (HttpRequestException hre)
         {

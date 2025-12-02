@@ -1,6 +1,7 @@
 using System.Text.Json;
 using backend.Models;
 using backend.Models.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace backend.Repositories;
 
@@ -25,5 +26,11 @@ public class SpaceRepository : ISpaceRepository
         await _context.SaveChangesAsync();
     }
 
-
+    public async Task<SpaceCacheEntity?> GetLastRecordBySource(string source)
+    {
+        return await _context.SpaceCaches
+            .OrderByDescending(r => r.Id)
+            .Where(s => s.Source == source)
+            .LastOrDefaultAsync();
+    }
 }
