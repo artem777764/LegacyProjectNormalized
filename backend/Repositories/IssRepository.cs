@@ -30,4 +30,12 @@ public class IssRepository : IIssRepository
     {
         return _context.IssFetchLogs.Order().AsNoTracking().Last();
     }
+
+    public async Task<List<IssFetchLogEntity>> GetLastNRecords(int n)
+    {
+        return await _context.IssFetchLogs
+            .OrderByDescending(r => r.Id)
+            .Take(n)
+            .ToListAsync();
+    }
 }
