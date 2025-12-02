@@ -44,7 +44,7 @@ public class OsdrRepository : IOsdrRepository
             if (existing != null)
             {
                 existing.Title = title;
-                existing.Status = status;
+                existing.Status = status ?? "Ok";
                 existing.UpdatedAt = updated ?? DateTime.UtcNow;
                 existing.Raw = raw;
             }
@@ -54,7 +54,7 @@ public class OsdrRepository : IOsdrRepository
                 {
                     DatasetId = datasetId,
                     Title = title,
-                    Status = status,
+                    Status = status ?? "Ok",
                     UpdatedAt = updated ?? DateTime.UtcNow,
                     Raw = raw
                 };
