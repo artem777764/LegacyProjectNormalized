@@ -1,6 +1,7 @@
 using System.Text.Json;
 using backend.Models;
 using backend.Models.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace backend.Repositories;
 
@@ -23,5 +24,10 @@ public class IssRepository : IIssRepository
 
         _context.IssFetchLogs.Add(item);
         await _context.SaveChangesAsync();
+    }
+
+    public async Task<IssFetchLogEntity> GetLastRecord()
+    {
+        return _context.IssFetchLogs.Order().AsNoTracking().Last();
     }
 }

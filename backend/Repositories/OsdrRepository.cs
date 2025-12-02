@@ -17,17 +17,14 @@ public class OsdrRepository : IOsdrRepository
 
     public async Task<int> SaveOsdrItemsAsync(JsonDocument doc)
     {
-        // получаем пары (datasetIdFromKey?, element)
         var items = ExtractItemsWithOptionalKeys(doc);
         int count = 0;
 
         foreach (var pair in items)
         {
-            string? datasetIdFromKey = pair.DatasetId; // может быть null
+            string? datasetIdFromKey = pair.DatasetId;
             var el = pair.Element;
 
-            // сначала пробуем взять dataset id из ключа (если он был),
-            // иначе используем TryExtractStringValue, как раньше
             var datasetId = !string.IsNullOrWhiteSpace(datasetIdFromKey)
                 ? datasetIdFromKey
                 : TryExtractStringValue(el, new[] { "dataset_id", "id", "uuid", "studyId", "accession" });
@@ -77,7 +74,6 @@ public class OsdrRepository : IOsdrRepository
         var root = doc.RootElement;
         var result = new List<(string?, JsonElement)>();
 
-        // 1) если корень — массив => каждый элемент (datasetId = null)
         if (root.ValueKind == JsonValueKind.Array)
         {
             foreach (var e in root.EnumerateArray())
@@ -85,10 +81,8 @@ public class OsdrRepository : IOsdrRepository
             return result;
         }
 
-        // 2) если корень — объект
         if (root.ValueKind == JsonValueKind.Object)
         {
-            // a) если есть items: [...]
             if (root.TryGetProperty("items", out var itemsProp) && itemsProp.ValueKind == JsonValueKind.Array)
             {
                 foreach (var e in itemsProp.EnumerateArray())
@@ -96,7 +90,6 @@ public class OsdrRepository : IOsdrRepository
                 return result;
             }
 
-            // b) если есть results: [...]
             if (root.TryGetProperty("results", out var resultsProp) && resultsProp.ValueKind == JsonValueKind.Array)
             {
                 foreach (var e in resultsProp.EnumerateArray())
@@ -104,9 +97,6 @@ public class OsdrRepository : IOsdrRepository
                 return result;
             }
 
-            // c) special case: объект-словарь вида { "OSD-1": { ... }, "OSD-2": { ... } }
-            //    — если *все* свойства корня являются объектами (или по крайней мере большинство),
-            //      считаем это map-форматом и разбираем пары (key -> value)
             bool looksLikeMap = true;
             int propCount = 0;
             foreach (var p in root.EnumerateObject())
@@ -114,7 +104,6 @@ public class OsdrRepository : IOsdrRepository
                 propCount++;
                 if (p.Value.ValueKind != JsonValueKind.Object)
                 {
-                    // если хоть одно значение не объект — не считаем map-форматом
                     looksLikeMap = false;
                     break;
                 }
@@ -124,15 +113,12 @@ public class OsdrRepository : IOsdrRepository
             {
                 foreach (var p in root.EnumerateObject())
                 {
-                    // p.Name — это dataset id (например "OSD-1")
-                    // p.Value — объект с полями (может содержать REST_URL, title и т.д.)
                     result.Add((p.Name, p.Value));
                 }
                 return result;
             }
         }
 
-        // 3) fallback: единственный объект — возвращаем как одиночный элемент
         result.Add((null, root));
         return result;
     }
