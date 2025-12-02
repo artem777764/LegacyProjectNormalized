@@ -10,13 +10,15 @@ public class FetchOsdrTask : IPeriodicTask
     public string Url { get; }
 
     private readonly IHttpService _httpClient;
-    private readonly ISpaceRepository _repo;
+    private readonly ISpaceRepository _repoSpace;
+    private readonly IOsdrRepository _repoOsdr;
     private readonly SpaceOptions _opts;
 
-    public FetchOsdrTask(IHttpService httpClient, ISpaceRepository repo, IOptions<SpaceOptions> opts)
+    public FetchOsdrTask(IHttpService httpClient, ISpaceRepository repoSpace, IOsdrRepository repoOsdr, IOptions<SpaceOptions> opts)
     {
         _httpClient = httpClient;
-        _repo = repo;
+        _repoSpace = repoSpace;
+        _repoOsdr = repoOsdr;
         _opts = opts.Value;
 
         Interval = TimeSpan.FromSeconds(Math.Max(1, _opts.OsdrInterval));
@@ -30,7 +32,8 @@ public class FetchOsdrTask : IPeriodicTask
             Console.WriteLine($"{Name}: fetching {Url}");
             using var doc = await _httpClient.GetJsonDocumentAsync(Url, stoppingToken);
             var raw = doc.RootElement.GetRawText();
-            await _repo.InsertSpaceCacheAsync("osdr", doc);
+            await _repoSpace.InsertSpaceCacheAsync("osdr", doc);
+            await _repoOsdr.SaveOsdrItemsAsync(doc);
         }
         catch (HttpRequestException hre)
         {
