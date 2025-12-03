@@ -31,6 +31,7 @@ builder.Services.AddScoped<FetchFlrTask>();
 builder.Services.AddScoped<FetchCmeTask>();
 builder.Services.AddScoped<FetchOsdrTask>();
 builder.Services.AddScoped<FetchIssTask>();
+builder.Services.AddScoped<TelemetryCsvTask>();
 
 builder.Services.AddScoped<IPeriodicTask, FetchApodTask>();
 builder.Services.AddScoped<IPeriodicTask, FetchNeoTask>();
@@ -39,6 +40,7 @@ builder.Services.AddScoped<IPeriodicTask, FetchFlrTask>();
 builder.Services.AddScoped<IPeriodicTask, FetchCmeTask>();
 builder.Services.AddScoped<IPeriodicTask, FetchOsdrTask>();
 builder.Services.AddScoped<IPeriodicTask, FetchIssTask>();
+builder.Services.AddScoped<IPeriodicTask, TelemetryCsvTask>();
 
 builder.Services.AddHostedService<PeriodicTaskHostedService>();
 
