@@ -48,21 +48,21 @@ public class SpaceController : ControllerBase
     }
     
     [HttpGet("{source}/latest")]
-    public async Task<IActionResult> GetLastRecord([FromRoute] string src)
+    public async Task<IActionResult> GetLastRecord([FromRoute] string source)
     {
-        SpaceCacheEntity? spaceRecord = await _spaceRepository.GetLastRecordBySource(src);
+        SpaceCacheEntity? spaceRecord = await _spaceRepository.GetLastRecordBySource(source);
         if (spaceRecord == null)
         {
             return Ok(new GetSpaceNoDateDTO
             {
-                Source = src ?? "null",
+                Source = source ?? "null",
                 Message = "No data",
             });
         }
 
         return Ok(new GetSpaceDTO
         {
-            Source = src!,
+            Source = source!,
             Fetched_at = spaceRecord.FetchedAt,
             Payload = spaceRecord.Payload,
         });

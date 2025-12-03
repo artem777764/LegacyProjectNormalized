@@ -46,8 +46,11 @@ public class OsdrController : ControllerBase
         return Ok(osdrItemEntity.Select(o => new GetOsdrDTO
         {
             Id = o.Id,
+            DatasetId = o.DatasetId,
+            Title = o.Title,
+            Status = o.Status,
             FetchedAt = o.InsertedAt,
-            Source = "osdr",
+            UpdatedAt = o.UpdatedAt,
             Payload = o.Raw,
         }));
     }
