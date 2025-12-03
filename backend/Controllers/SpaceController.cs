@@ -13,30 +13,78 @@ namespace backend.Controllers;
 public class SpaceController : ControllerBase
 {
     private readonly ISpaceRepository _spaceRepository;
+    private readonly FetchApodTask _fetchApodTask;
+    private readonly FetchCmeTask _fetchCmeTask;
+    private readonly FetchOsdrTask _fetchOsdrTask;
+    private readonly FetchFlrTask _fetchFlrTask;
+    private readonly FetchIssTask _fetchIssTask;
+    private readonly FetchNeoTask _fetchNeoTask;
+    private readonly FetchSpacexTask _fetchSpacexTask;
 
-    public SpaceController(ISpaceRepository spaceRepository)
+    public SpaceController(
+        ISpaceRepository spaceRepository,
+        FetchApodTask fetchApodTask,
+        FetchCmeTask fetchCmeTask,
+        FetchOsdrTask fetchOsdrTask,
+        FetchFlrTask fetchFlrTask,
+        FetchIssTask fetchIssTask,
+        FetchNeoTask fetchNeoTask,
+        FetchSpacexTask fetchSpacexTask
+    )
     {
         _spaceRepository = spaceRepository;
+        _fetchApodTask = fetchApodTask;
+        _fetchCmeTask = fetchCmeTask;
+        _fetchOsdrTask = fetchOsdrTask;
+        _fetchFlrTask = fetchFlrTask;
+        _fetchIssTask = fetchIssTask;
+        _fetchNeoTask = fetchNeoTask;
+        _fetchSpacexTask = fetchSpacexTask;
     }
     
     [HttpGet("{source}/latest")]
-    public async Task<IActionResult> GetLastRecord([FromRoute] string source)
+    public async Task<IActionResult> GetLastRecord([FromRoute] string src)
     {
-        SpaceCacheEntity? spaceRecord = await _spaceRepository.GetLastRecordBySource(source);
+        SpaceCacheEntity? spaceRecord = await _spaceRepository.GetLastRecordBySource(src);
         if (spaceRecord == null)
         {
             return Ok(new GetSpaceNoDateDTO
             {
-                Source = source ?? "null",
+                Source = src ?? "null",
                 Message = "No data",
             });
         }
 
         return Ok(new GetSpaceDTO
         {
-            Source = source!,
+            Source = src!,
             Fetched_at = spaceRecord.FetchedAt,
             Payload = spaceRecord.Payload,
         });
+    }
+
+    [HttpGet("refresh")]
+    public async Task<IActionResult> Refresh([FromQuery] string src = "apod,neo,flr,cme,spacex")
+    {
+        List<string> options = src.Split(",").ToList();
+        List<string> refreshed = new List<string>();
+
+        foreach (string option in options)
+        {
+            if (option == "apod") await _fetchApodTask.ExecuteAsync(CancellationToken.None);
+            else if (option == "neo") await _fetchNeoTask.ExecuteAsync(CancellationToken.None);
+            else if (option == "flr") await _fetchFlrTask.ExecuteAsync(CancellationToken.None);
+            else if (option == "cme") await _fetchCmeTask.ExecuteAsync(CancellationToken.None);
+            else if (option == "spacex") await _fetchSpacexTask.ExecuteAsync(CancellationToken.None);
+            else if (option == "iss") await _fetchIssTask.ExecuteAsync(CancellationToken.None);
+            else if (option == "osdr") await _fetchOsdrTask.ExecuteAsync(CancellationToken.None);
+            else
+            {
+                continue;
+            }
+            refreshed.Add(option);
+        }
+
+        return Ok(refreshed);
     }
 }
