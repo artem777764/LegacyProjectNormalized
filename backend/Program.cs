@@ -1,7 +1,9 @@
 using System.Text.Json;
 using backend.Models;
 using backend.PeriodicTasks;
+using backend.PeriodicTasks.Tasks;
 using backend.Repositories;
+using backend.TelemetryService;
 using Microsoft.EntityFrameworkCore;
 using OrderService.Models;
 using SpaceApp.Options;
@@ -23,6 +25,10 @@ builder.Services.AddScoped<IOsdrRepository, OsdrRepository>();
 builder.Services.AddHttpClient();
 builder.Services.AddSingleton<IHttpService, HttpService>();
 builder.Services.AddSingleton<ApiSender>();
+
+builder.Services.AddScoped<ITelemetryFormatter, TelemetryFormatter>();
+builder.Services.AddScoped<IFileGeneratorCsv, CsvGenerator>();
+builder.Services.AddScoped<IFileGeneratorXlsx, XlsxGenerator>();
 
 builder.Services.AddScoped<FetchApodTask>();
 builder.Services.AddScoped<FetchNeoTask>();

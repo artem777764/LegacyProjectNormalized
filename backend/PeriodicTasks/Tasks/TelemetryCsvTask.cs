@@ -1,95 +1,84 @@
 using System.Globalization;
-using System.Text;
+using backend.TelemetryService;
 
-namespace backend.PeriodicTasks
+namespace backend.PeriodicTasks.Tasks;
+
+public class TelemetryCsvTask : IPeriodicTask
 {
-    public class TelemetryCsvTask : IPeriodicTask
+    public string Name => "telemetry_csv_gen";
+    public TimeSpan Interval { get; }
+
+    private readonly string _outDir;
+    private readonly Random _random;
+    private readonly ITelemetryFormatter _formatter;
+    private readonly IFileGeneratorCsv _csvGen;
+    private readonly IFileGeneratorXlsx _xlsxGen;
+
+    public TelemetryCsvTask(
+        IConfiguration cfg,
+        ITelemetryFormatter formatter,
+        IFileGeneratorCsv csvGen,
+        IFileGeneratorXlsx xlsxGen)
     {
-        public string Name => "telemetry_csv_gen";
-        public TimeSpan Interval { get; }
+        _random = new Random();
 
-        private readonly string _outDir;
-        private readonly Random _random;
+        var intervalSec = cfg.GetValue<int?>("Telemetry:IntervalSec") ?? 300;
+        Interval = TimeSpan.FromSeconds(intervalSec);
 
-        public TelemetryCsvTask(IConfiguration cfg, ILogger<TelemetryCsvTask> logger)
+        _outDir = cfg.GetValue<string?>("Telemetry:OutDir") ?? "D:\\";
+        if (!string.IsNullOrEmpty(_outDir) && !_outDir.EndsWith(Path.DirectorySeparatorChar))
+            _outDir += Path.DirectorySeparatorChar;
+
+        _formatter = formatter;
+        _csvGen = csvGen;
+        _xlsxGen = xlsxGen;
+    }
+
+    public async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        try
         {
-            _random = new Random();
+            var record = CreateRecord();
+            var ts = record.RecordedAt.ToString("yyyyMMdd_HHmmss", CultureInfo.InvariantCulture);
+            var csvName = $"telemetry_{ts}.csv";
+            var xlsxName = $"telemetry_{ts}.xlsx";
+            var csvPath = Path.Combine(_outDir, csvName);
+            var xlsxPath = Path.Combine(_outDir, xlsxName);
 
-            var intervalSec = cfg.GetValue<int?>("Telemetry:IntervalSec") ?? 300;
-            Interval = TimeSpan.FromSeconds(intervalSec);
+            var dir = Path.GetDirectoryName(_outDir.TrimEnd(Path.DirectorySeparatorChar));
+            if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
+                Directory.CreateDirectory(dir);
 
-            _outDir = cfg.GetValue<string?>("Telemetry:OutDir") ?? "D:\\";
-            if (!string.IsNullOrEmpty(_outDir) && !_outDir.EndsWith(Path.DirectorySeparatorChar))
-                _outDir += Path.DirectorySeparatorChar;
+            var t1 = _csvGen.WriteCsvAsync(csvPath, csvName, record, stoppingToken);
+            var t2 = _xlsxGen.WriteXlsxAsync(xlsxPath, csvName, record, stoppingToken);
+
+            await Task.WhenAll(t1, t2);
         }
-
-        public async Task ExecuteAsync(CancellationToken stoppingToken)
+        catch (Exception ex)
         {
-            try
-            {
-                if (stoppingToken.IsCancellationRequested) return;
-                await GenerateCsvAsync(stoppingToken);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Ошибка в ExecuteAsync TelemetryCsvTask: {ex.Message}");
-            }
+            Console.WriteLine($"Ошибка в ExecuteAsync TelemetryCsvTask: {ex.Message}");
         }
-        private async Task GenerateCsvAsync(CancellationToken token)
+    }
+
+    private TelemetryRecord CreateRecord()
+    {
+        var now = DateTime.UtcNow;
+        bool logical = _random.Next(0, 2) == 1;
+        string logicalRus = logical ? "ИСТИНА" : "ЛОЖЬ";
+        double voltage = RandDouble(3.2, 12.6);
+        double temp = RandDouble(-50.0, 80.0);
+
+        return new TelemetryRecord
         {
-            try
-            {
-                var dir = Path.GetDirectoryName(_outDir.TrimEnd(Path.DirectorySeparatorChar));
-                if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
-                    Directory.CreateDirectory(dir);
+            RecordedAt = now,
+            LogicalRus = logicalRus,
+            Voltage = Math.Round(voltage, 2),
+            Temp = Math.Round(temp, 2)
+        };
+    }
 
-                var now = DateTime.UtcNow;
-                var ts = now.ToString("yyyyMMdd_HHmmss");
-                var filename = $"telemetry_{ts}.csv";
-                var fullpath = Path.Combine(_outDir, filename);
-
-                bool logical = _random.Next(0, 2) == 1;
-                string logicalRus = logical ? "ИСТИНА" : "ЛОЖЬ";
-                double voltage = RandDouble(3.2, 12.6);
-                double temp = RandDouble(-50.0, 80.0);
-
-                var sb = new StringBuilder();
-                sb.AppendLine("recorded_at,logical,voltage,temp,source_file");
-
-                string recordedAt = now.ToString("yyyy-MM-dd HH:mm:ss");
-                string voltageTxt = voltage.ToString("0.00", CultureInfo.InvariantCulture);
-                string tempTxt = temp.ToString("0.00", CultureInfo.InvariantCulture);
-
-                sb.AppendLine(string.Join(",",
-                    recordedAt,
-                    QuoteCsv(logicalRus),
-                    voltageTxt,
-                    tempTxt,
-                    QuoteCsv(filename)
-                ));
-
-                var tmpPath = fullpath + ".tmp";
-                await File.WriteAllTextAsync(tmpPath, sb.ToString(), Encoding.UTF8, token);
-                if (File.Exists(fullpath))
-                    File.Delete(fullpath);
-                File.Move(tmpPath, fullpath);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Ошибка при генерации CSV: {ex}");
-            }
-        }
-
-        private static string QuoteCsv(string s)
-        {
-            if (s == null) return "\"\"";
-            var inner = s.Replace("\"", "\"\"");
-            return $"\"{inner}\"";
-        }
-
-        private double RandDouble(double min, double max)
-        {
-            return min + _random.NextDouble() * (max - min);
-        }
+    private double RandDouble(double min, double max)
+    {
+        return min + _random.NextDouble() * (max - min);
     }
 }
