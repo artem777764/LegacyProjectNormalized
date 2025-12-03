@@ -212,4 +212,9 @@ public class OsdrRepository : IOsdrRepository
 
         return null;
     }
+
+    public async Task<int> GetDatasetsCount()
+    {
+        return await _context.OsdrItems.CountAsync();
+    }
 }

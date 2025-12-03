@@ -13,6 +13,7 @@ namespace backend.Controllers;
 public class SpaceController : ControllerBase
 {
     private readonly ISpaceRepository _spaceRepository;
+    private readonly IOsdrRepository _osdrRepository;
     private readonly FetchApodTask _fetchApodTask;
     private readonly FetchCmeTask _fetchCmeTask;
     private readonly FetchOsdrTask _fetchOsdrTask;
@@ -21,8 +22,11 @@ public class SpaceController : ControllerBase
     private readonly FetchNeoTask _fetchNeoTask;
     private readonly FetchSpacexTask _fetchSpacexTask;
 
+    private static readonly List<string> Sources = new List<string> { "apod", "neo", "flr", "cme", "spacex", "osdr", "iss" };
+
     public SpaceController(
         ISpaceRepository spaceRepository,
+        IOsdrRepository osdrRepository,
         FetchApodTask fetchApodTask,
         FetchCmeTask fetchCmeTask,
         FetchOsdrTask fetchOsdrTask,
@@ -33,6 +37,7 @@ public class SpaceController : ControllerBase
     )
     {
         _spaceRepository = spaceRepository;
+        _osdrRepository = osdrRepository;
         _fetchApodTask = fetchApodTask;
         _fetchCmeTask = fetchCmeTask;
         _fetchOsdrTask = fetchOsdrTask;
@@ -86,5 +91,27 @@ public class SpaceController : ControllerBase
         }
 
         return Ok(refreshed);
+    }
+
+    [HttpGet("summary")]
+    public async Task<IActionResult> Summary()
+    {
+        var result = new SpaceSummaryDTO();
+
+        foreach (string source in Sources)
+        {
+            SpaceCacheEntity? lastRecord = await _spaceRepository.GetLastRecordBySource(source);
+            if (lastRecord != null)
+            {
+                result.Items[source] = new GetSpaceItemSummaryDTO
+                {
+                    FetchedAt = lastRecord.FetchedAt,
+                    Payload = lastRecord.Payload,
+                };
+            }
+        }
+
+        result.osdrCount = await _osdrRepository.GetDatasetsCount();
+        return Ok(result);
     }
 }
