@@ -10,6 +10,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<IssFetchLogEntity> IssFetchLogs { get; set; } = null!;
     public DbSet<OsdrItemEntity> OsdrItems { get; set; } = null!;
     public DbSet<SpaceCacheEntity> SpaceCaches { get; set; } = null!;
+    public DbSet<TelemetryLogEntity> TelemetryLogs { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -35,5 +36,14 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Entity<SpaceCacheEntity>()
             .Property(x => x.Payload)
             .HasColumnType("jsonb");
+
+        modelBuilder.Entity<TelemetryLogEntity>(eb =>
+        {
+            eb.HasKey(x => x.Id);
+            eb.Property(x => x.RecordedAt).IsRequired();
+            eb.Property(x => x.LogicalRus).IsRequired();
+            eb.Property(x => x.SourceFile).IsRequired();
+            eb.HasIndex(x => x.RecordedAt);
+        });
     }
 }

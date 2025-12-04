@@ -1,7 +1,9 @@
 using System.Text.Json;
 using backend.Models;
 using backend.PeriodicTasks;
+using backend.PeriodicTasks.Tasks;
 using backend.Repositories;
+using backend.TelemetryService;
 using Microsoft.EntityFrameworkCore;
 using OrderService.Models;
 using SpaceApp.Options;
@@ -19,10 +21,15 @@ builder.Services.Configure<SpaceOptions>(
 builder.Services.AddScoped<ISpaceRepository, SpaceRepository>();
 builder.Services.AddScoped<IIssRepository, IssRepository>();
 builder.Services.AddScoped<IOsdrRepository, OsdrRepository>();
+builder.Services.AddScoped<ITelemetryRepository, TelemetryRepository>();
     
 builder.Services.AddHttpClient();
 builder.Services.AddSingleton<IHttpService, HttpService>();
 builder.Services.AddSingleton<ApiSender>();
+
+builder.Services.AddScoped<ITelemetryFormatter, TelemetryFormatter>();
+builder.Services.AddScoped<IFileGeneratorCsv, CsvGenerator>();
+builder.Services.AddScoped<IFileGeneratorXlsx, XlsxGenerator>();
 
 builder.Services.AddScoped<FetchApodTask>();
 builder.Services.AddScoped<FetchNeoTask>();
@@ -31,6 +38,7 @@ builder.Services.AddScoped<FetchFlrTask>();
 builder.Services.AddScoped<FetchCmeTask>();
 builder.Services.AddScoped<FetchOsdrTask>();
 builder.Services.AddScoped<FetchIssTask>();
+builder.Services.AddScoped<TelemetryCsvTask>();
 
 builder.Services.AddScoped<IPeriodicTask, FetchApodTask>();
 builder.Services.AddScoped<IPeriodicTask, FetchNeoTask>();
@@ -39,6 +47,7 @@ builder.Services.AddScoped<IPeriodicTask, FetchFlrTask>();
 builder.Services.AddScoped<IPeriodicTask, FetchCmeTask>();
 builder.Services.AddScoped<IPeriodicTask, FetchOsdrTask>();
 builder.Services.AddScoped<IPeriodicTask, FetchIssTask>();
+builder.Services.AddScoped<IPeriodicTask, TelemetryCsvTask>();
 
 builder.Services.AddHostedService<PeriodicTaskHostedService>();
 
