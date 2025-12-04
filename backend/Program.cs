@@ -21,6 +21,7 @@ builder.Services.Configure<SpaceOptions>(
 builder.Services.AddScoped<ISpaceRepository, SpaceRepository>();
 builder.Services.AddScoped<IIssRepository, IssRepository>();
 builder.Services.AddScoped<IOsdrRepository, OsdrRepository>();
+builder.Services.AddScoped<ITelemetryRepository, TelemetryRepository>();
     
 builder.Services.AddHttpClient();
 builder.Services.AddSingleton<IHttpService, HttpService>();

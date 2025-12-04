@@ -1,4 +1,6 @@
 using System.Globalization;
+using backend.Models.Entities;
+using backend.Repositories;
 using backend.TelemetryService;
 
 namespace backend.PeriodicTasks.Tasks;
@@ -13,12 +15,14 @@ public class TelemetryCsvTask : IPeriodicTask
     private readonly ITelemetryFormatter _formatter;
     private readonly IFileGeneratorCsv _csvGen;
     private readonly IFileGeneratorXlsx _xlsxGen;
+    private readonly ITelemetryRepository _telemetryRepo;
 
     public TelemetryCsvTask(
         IConfiguration cfg,
         ITelemetryFormatter formatter,
         IFileGeneratorCsv csvGen,
-        IFileGeneratorXlsx xlsxGen)
+        IFileGeneratorXlsx xlsxGen,
+        ITelemetryRepository telemetryRepo)
     {
         _random = new Random();
 
@@ -32,6 +36,7 @@ public class TelemetryCsvTask : IPeriodicTask
         _formatter = formatter;
         _csvGen = csvGen;
         _xlsxGen = xlsxGen;
+        _telemetryRepo = telemetryRepo;
     }
 
     public async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -53,6 +58,18 @@ public class TelemetryCsvTask : IPeriodicTask
             var t2 = _xlsxGen.WriteXlsxAsync(xlsxPath, csvName, record, stoppingToken);
 
             await Task.WhenAll(t1, t2);
+
+            var entity = new TelemetryLogEntity
+            {
+                RecordedAt = record.RecordedAt,
+                Logical = record.LogicalRus == "ИСТИНА",
+                LogicalRus = record.LogicalRus,
+                Voltage = record.Voltage,
+                Temp = record.Temp,
+                SourceFile = csvName,
+            };
+
+            await _telemetryRepo.InsertAsync(entity, stoppingToken);
         }
         catch (Exception ex)
         {
