@@ -17,8 +17,6 @@
           >
             Обновить
           </button>
-
-          <router-link to="/" class="text-sm text-slate-300 hover:text-white">Назад</router-link>
         </div>
       </div>
 

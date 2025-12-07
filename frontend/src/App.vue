@@ -1,7 +1,7 @@
 <template>
   <div>
     <NavBar />
-    <main class="pt-14 bg-white text-gray-800 min-h-screen">
+    <main class="pt-16 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-800 text-slate-100 min-h-screen">
       <router-view />
     </main>
   </div>
