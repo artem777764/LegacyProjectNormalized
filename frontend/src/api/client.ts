@@ -1,6 +1,6 @@
 import axios, { type AxiosInstance, type AxiosRequestConfig } from 'axios';
 
-const API_BASE = "http://localhost:5022/"
+const API_BASE = import.meta.env.VITE_API_BASE
 
 function createClient(): AxiosInstance {
   const instance = axios.create({

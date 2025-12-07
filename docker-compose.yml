@@ -1,0 +1,45 @@
+services:
+  frontend:
+    image: artem777764/legacy_p_frontend
+    environment:
+      VITE_API_BASE: "http://backend:2301/"
+    ports:
+      - "2302:2302"
+    depends_on:
+      - backend
+
+  backend:
+    image: artem777764/legacy_p_backend
+    env_file:
+      - backend/.env
+    environment:
+      ConnectionStrings__ApplicationDatabase: Host=application_database;Port=5432;Database=RefactoringProjectDb;Username=postgres;Password=12345
+      Telemetry__OutDir: /app/out
+    ports:
+      - "2301:2301"
+    depends_on:
+      application_database:
+        condition: service_healthy
+    volumes:
+      - ./reports:/app/out
+    command: sh -c "sleep 10 && dotnet backend.dll"
+
+  application_database:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_DB: RefactoringProjectDb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 12345
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d RefactoringProjectDb"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  pgdata:
