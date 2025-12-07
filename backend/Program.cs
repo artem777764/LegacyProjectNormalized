@@ -8,6 +8,7 @@ using DotNetEnv;
 using Microsoft.EntityFrameworkCore;
 using OrderService.Models;
 using SpaceApp.Options;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,6 +29,11 @@ builder.Services.AddCors(options =>
 string connectionString = builder.Configuration.GetConnectionString("ApplicationDatabase")!;
 builder.Services.AddDbContext<ApplicationDbContext>(opt =>
     opt.UseNpgsql(connectionString)
+);
+
+string redisConnStr = builder.Configuration.GetConnectionString("Redis")!;
+builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
+    ConnectionMultiplexer.Connect(redisConnStr)
 );
 
 builder.Services.Configure<SpaceOptions>(
@@ -89,14 +95,11 @@ builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
+app.UseSwagger(); // http://localhost:5022/swagger/index.html
+app.UseSwaggerUI(c =>
 {
-    app.UseSwagger(); // http://localhost:5022/swagger/index.html
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Defect Managment Project API");
-    });
-}
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Defect Managment Project API");
+});
 
 app.UseCors("AllowAll");
 app.UseHttpsRedirection();
