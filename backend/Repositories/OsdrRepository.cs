@@ -21,7 +21,14 @@ public class OsdrRepository : IOsdrRepository
             .OrderByDescending(r => r.Id)
             .Take(n)
             .ToListAsync();
-    } 
+    }
+
+    public async Task<List<OsdrItemEntity>> GetAllRecords()
+    {
+        return await _context.OsdrItems
+            .OrderByDescending(r => r.Id)
+            .ToListAsync();
+    }
 
     public async Task<int> SaveOsdrItemsAsync(JsonDocument doc)
     {

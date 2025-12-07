@@ -4,11 +4,26 @@ using backend.PeriodicTasks;
 using backend.PeriodicTasks.Tasks;
 using backend.Repositories;
 using backend.TelemetryService;
+using DotNetEnv;
 using Microsoft.EntityFrameworkCore;
 using OrderService.Models;
 using SpaceApp.Options;
 
 var builder = WebApplication.CreateBuilder(args);
+
+Env.Load();
+builder.Configuration.AddEnvironmentVariables();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173")
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+});
 
 string connectionString = builder.Configuration.GetConnectionString("ApplicationDatabase")!;
 builder.Services.AddDbContext<ApplicationDbContext>(opt =>
@@ -83,6 +98,7 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+app.UseCors("AllowAll");
 app.UseHttpsRedirection();
 app.UseRouting();
 app.MapControllers();
