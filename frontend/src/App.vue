@@ -1,13 +1,12 @@
-<script setup lang="ts">
-
-</script>
-
 <template>
   <div>
-    
+    <NavBar />
+    <main class="pt-14 bg-white text-gray-800 min-h-screen">
+      <router-view />
+    </main>
   </div>
 </template>
 
-<style scoped>
-
-</style>
+<script setup lang="ts">
+import NavBar from '@/components/NavBar.vue';
+</script>
