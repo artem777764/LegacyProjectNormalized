@@ -23,11 +23,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted } from 'vue';
+import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { routes } from '@/router/routes';
 import type { RouteItem } from '@/router/routes';
-import endpoints from '@/api/endpoints';
 
 const route = useRoute();
 
@@ -36,10 +35,6 @@ const navItems = computed<RouteItem[]>(() => routes);
 function isActive(path: string) {
   return route.path === path;
 }
-
-onMounted(async () => {
-  await endpoints.getIssTrend();
-})
 </script>
 
 <style scoped>

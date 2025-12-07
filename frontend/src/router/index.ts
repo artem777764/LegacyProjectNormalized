@@ -4,7 +4,7 @@ import { routes } from './routes';
 const routeMap: Record<string, () => Promise<any>> = {
   Home: () => import('@/views/TempView.vue'),
   About: () => import('@/views/TempView.vue'),
-  Projects: () => import('@/views/TempView.vue'),
+  Gallery: () => import('@/views/JwstGalleryView.vue'),
   Iss: () => import('@/views/IssTrendView.vue'),
 };
 

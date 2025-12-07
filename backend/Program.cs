@@ -4,11 +4,15 @@ using backend.PeriodicTasks;
 using backend.PeriodicTasks.Tasks;
 using backend.Repositories;
 using backend.TelemetryService;
+using DotNetEnv;
 using Microsoft.EntityFrameworkCore;
 using OrderService.Models;
 using SpaceApp.Options;
 
 var builder = WebApplication.CreateBuilder(args);
+
+Env.Load();
+builder.Configuration.AddEnvironmentVariables();
 
 builder.Services.AddCors(options =>
 {
