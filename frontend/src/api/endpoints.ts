@@ -1,3 +1,4 @@
+import type { IssTrend } from '@/models/IssTrend';
 import { apiClient } from './client';
 import type { AxiosRequestConfig } from 'axios';
 
@@ -13,8 +14,12 @@ export async function getJson<T = unknown>(
   return resp.data;
 }
 
+export async function getIssTrend(): Promise<IssTrend> {
+  return getJson<IssTrend>('/Iss/trend');
+}
+
 export const endpoints = {
-  
+  getIssTrend
 };
 
 export default endpoints;

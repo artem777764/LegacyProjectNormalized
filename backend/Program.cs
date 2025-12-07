@@ -10,6 +10,17 @@ using SpaceApp.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173")
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+});
+
 string connectionString = builder.Configuration.GetConnectionString("ApplicationDatabase")!;
 builder.Services.AddDbContext<ApplicationDbContext>(opt =>
     opt.UseNpgsql(connectionString)
@@ -83,6 +94,7 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+app.UseCors("AllowAll");
 app.UseHttpsRedirection();
 app.UseRouting();
 app.MapControllers();

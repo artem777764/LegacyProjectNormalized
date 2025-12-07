@@ -5,7 +5,7 @@ const routeMap: Record<string, () => Promise<any>> = {
   Home: () => import('@/views/TempView.vue'),
   About: () => import('@/views/TempView.vue'),
   Projects: () => import('@/views/TempView.vue'),
-  Contact: () => import('@/views/TempView.vue'),
+  Iss: () => import('@/views/IssTrendView.vue'),
 };
 
 const appRoutes: RouteRecordRaw[] = routes.map(r => ({
