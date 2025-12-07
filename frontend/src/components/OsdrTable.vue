@@ -89,30 +89,29 @@ const sortIcon = (key: typeof sortKey.value) => {
 
 <template>
   <div class="p-4">
-    <!-- Таблица: теперь без своего хедера (он на странице) -->
     <div class="overflow-x-auto rounded-2xl border border-white/10 backdrop-blur bg-white/5 shadow-xl">
       <table class="w-full text-sm">
         <thead class="bg-white/10 text-gray-300 uppercase text-xs tracking-wider">
           <tr>
-            <th class="px-4 py-3 cursor-pointer" @click="toggleSort('id')">
+            <th class="px-4 py-3 cursor-pointer text-center" @click="toggleSort('id')">
               # <span :class="['inline-block transition', sortIcon('id')]">▼</span>
             </th>
-            <th class="px-4 py-3 cursor-pointer" @click="toggleSort('datasetId')">
+            <th class="px-4 py-3 cursor-pointer text-center" @click="toggleSort('datasetId')">
               dataset_id <span :class="['inline-block transition', sortIcon('datasetId')]">▼</span>
             </th>
-            <th class="px-4 py-3 cursor-pointer" @click="toggleSort('title')">
+            <th class="px-4 py-3 cursor-pointer text-center" @click="toggleSort('title')">
               title <span :class="['inline-block transition', sortIcon('title')]">▼</span>
             </th>
-            <th class="px-4 py-3 cursor-pointer" @click="toggleSort('restUrl')">
+            <th class="px-4 py-3 cursor-pointer text-center" @click="toggleSort('restUrl')">
               REST_URL <span :class="['inline-block transition', sortIcon('restUrl')]">▼</span>
             </th>
-            <th class="px-4 py-3 cursor-pointer" @click="toggleSort('updatedAt')">
+            <th class="px-4 py-3 cursor-pointer text-center" @click="toggleSort('updatedAt')">
               updated_at <span :class="['inline-block transition', sortIcon('updatedAt')]">▼</span>
             </th>
-            <th class="px-4 py-3 cursor-pointer" @click="toggleSort('fetchedAt')">
+            <th class="px-4 py-3 cursor-pointer text-center" @click="toggleSort('fetchedAt')">
               inserted_at <span :class="['inline-block transition', sortIcon('fetchedAt')]">▼</span>
             </th>
-            <th class="px-4 py-3">raw</th>
+            <th class="px-4 py-3 text-center">raw</th>
           </tr>
         </thead>
 
@@ -123,35 +122,35 @@ const sortIcon = (key: typeof sortKey.value) => {
                      hover:bg-white/10 hover:scale-[1.002]
                      active:scale-[0.995] cursor-pointer group"
             >
-              <td class="px-4 py-3 text-gray-400">
+              <td class="px-4 py-3 text-gray-400 text-center align-middle">
                 {{ index + 1 }}
               </td>
-              <td class="px-4 py-3 font-mono text-blue-300">
+              <td class="px-4 py-3 font-mono text-blue-300 text-center align-middle">
                 {{ row.datasetId || '—' }}
               </td>
-              <td class="px-4 py-3 max-w-xl truncate text-gray-200">
+              <td class="px-4 py-3 max-w-xl truncate text-gray-200 text-center align-middle">
                 {{ row.title || '—' }}
               </td>
-              <td class="px-4 py-3">
+              <td class="px-4 py-3 text-center align-middle">
                 <a
                   v-if="extractRestUrl(row)"
                   :href="extractRestUrl(row)!"
                   target="_blank"
                   rel="noopener"
-                  class="text-sky-400 hover:text-sky-300 underline underline-offset-2 transition"
+                  class="text-sky-400 hover:text-sky-300 underline underline-offset-2 transition inline-block"
                   @click.stop
                 >
                   открыть
                 </a>
                 <span v-else class="text-gray-500">—</span>
               </td>
-              <td class="px-4 py-3 text-gray-300">
+              <td class="px-4 py-3 text-gray-300 text-center align-middle">
                 {{ formatToMoscowTime(row.updatedAt) }}
               </td>
-              <td class="px-4 py-3 text-gray-400">
+              <td class="px-4 py-3 text-gray-400 text-center align-middle">
                 {{ formatToMoscowTime(row.fetchedAt) }}
               </td>
-              <td class="px-4 py-3">
+              <td class="px-4 py-3 flex justify-center items-center">
                 <button
                   class="px-3 py-1 rounded-lg border border-white/20
                          text-xs text-gray-200 hover:bg-white/10

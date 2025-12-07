@@ -2,7 +2,7 @@ import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 import { routes } from './routes';
 
 const routeMap: Record<string, () => Promise<any>> = {
-  Home: () => import('@/views/TempView.vue'),
+  Events: () => import('@/views/AstroEventsView.vue'),
   Osdr: () => import('@/views/OsdrDatasetsView.vue'),
   Gallery: () => import('@/views/JwstGalleryView.vue'),
   Iss: () => import('@/views/IssTrendView.vue'),

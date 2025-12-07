@@ -1,7 +1,8 @@
-import type { IssTrend } from '@/models/IssTrend';
-import { apiClient } from './client';
 import type { AxiosRequestConfig } from 'axios';
+import { apiClient } from './client';
+import type { IssTrend } from '@/models/IssTrend';
 import type { OsdrItem } from '@/models/OsdrItem';
+import type { AstroResponse } from '@/models/AstroEvent';
 
 export type ApiResponse<T> = {
   data: T;
@@ -27,9 +28,18 @@ export async function getOsdrListAll(): Promise<OsdrItem[]> {
   }));
 }
 
+export async function getAstroEvents(
+  lat = 55.7558,
+  lon = 37.6176,
+  days = 7
+): Promise<AstroResponse> {
+  return getJson<AstroResponse>(`/Astro/events?lat=${lat}&lon=${lon}&days=${days}`);
+}
+
 export const endpoints = {
   getIssTrend,
-  getOsdrListAll
+  getOsdrListAll,
+  getAstroEvents
 };
 
 export default endpoints;
