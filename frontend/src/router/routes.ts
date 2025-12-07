@@ -6,7 +6,7 @@ export type RouteItem = {
 
 export const routes: RouteItem[] = [
   { path: '/', name: 'Home', label: 'Главная' },
-  { path: '/about', name: 'About', label: 'О нас' },
+  { path: '/osdr', name: 'Osdr', label: 'Osdr' },
   { path: '/gallery', name: 'Gallery', label: 'Gallery' },
   { path: '/iss', name: 'Iss', label: 'Iss' },
 ];

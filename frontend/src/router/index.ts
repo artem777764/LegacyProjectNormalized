@@ -3,7 +3,7 @@ import { routes } from './routes';
 
 const routeMap: Record<string, () => Promise<any>> = {
   Home: () => import('@/views/TempView.vue'),
-  About: () => import('@/views/TempView.vue'),
+  Osdr: () => import('@/views/OsdrDatasetsView.vue'),
   Gallery: () => import('@/views/JwstGalleryView.vue'),
   Iss: () => import('@/views/IssTrendView.vue'),
 };

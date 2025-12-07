@@ -8,4 +8,5 @@ public interface IOsdrRepository
     Task<int> SaveOsdrItemsAsync(JsonDocument doc);
     Task<List<OsdrItemEntity>> GetLastNRecords(int n);
     Task<int> GetDatasetsCount();
+    Task<List<OsdrItemEntity>> GetAllRecords();
 }

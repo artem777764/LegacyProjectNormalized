@@ -54,4 +54,20 @@ public class OsdrController : ControllerBase
             Payload = o.Raw,
         }));
     }
+
+    [HttpGet("list/all")]
+    public async Task<IActionResult> GetAllRecords()
+    {
+        List<OsdrItemEntity> osdrItemEntity = await _osdrRepository.GetAllRecords();
+        return Ok(osdrItemEntity.Select(o => new GetOsdrDTO
+        {
+            Id = o.Id,
+            DatasetId = o.DatasetId,
+            Title = o.Title,
+            Status = o.Status,
+            FetchedAt = o.InsertedAt,
+            UpdatedAt = o.UpdatedAt,
+            Payload = o.Raw,
+        }));
+    }
 }
